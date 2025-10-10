@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: church-application
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+    contexts: production
+    enabled: false
+
+  jwt:
+    secret: ${SPRING_JWT_SECRET}
+
+  http:
+    codecs:
+      max-in-memory-size: 16MB
+
+
+
+
+server:
+  port: 8080
+
+# Logging
+logging:
+  level:
+    org.springframework.jdbc.core: trace
+    org.springframework.jdbc.core.simple: trace
+
+
+centrifugo:
+  api-url: https://your-centrifugo-instance.com/api
+  api-key: your-secret-api-key
