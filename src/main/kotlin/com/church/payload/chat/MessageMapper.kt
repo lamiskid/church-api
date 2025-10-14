@@ -20,5 +20,26 @@ fun ChatRoom.toResponse(): ChatRoomResponse =
         name = name,
         type = type,
         channelId = channelId,
-        participants = participants.map { UserSummary(it.id, it.username) }
+        participants = participants.map { UserSummary(it.id, it.username) },
+        lastMessage = null
     )
+
+fun ChatRoom.toResponse(lastMessage: Message?): ChatRoomResponse {
+    return ChatRoomResponse(
+        id = id,
+        name = name,
+        type = type,
+        channelId = channelId,
+        participants = participants.map { UserSummary(it.id, it.username) },
+        lastMessage = lastMessage?.let {
+            MessageResponse(
+                id = it.id,
+                senderId = it.sender.id,
+                content = it.content,
+                createdAt = it.createdAt,
+                chatRoomId = id,
+                senderName = it.sender.firstName
+            )
+        }
+    )
+}

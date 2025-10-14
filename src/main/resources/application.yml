@@ -37,10 +37,10 @@ server:
 # Logging
 logging:
   level:
-    org.springframework.jdbc.core: trace
-    org.springframework.jdbc.core.simple: trace
+    org.springframework.jdbc.core: off
+    org.springframework.jdbc.core.simple: off
 
 
 centrifugo:
-  api-url: https://your-centrifugo-instance.com/api
-  api-key: your-secret-api-key
+  api-url: http://localhost:8000/api
+  api-key: my_api_key

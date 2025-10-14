@@ -24,7 +24,8 @@ class Account(
     @Column(name = "updated_at", nullable = false)
     val updatedAt: Long =System.currentTimeMillis(),
 
-    @OneToMany(mappedBy = "account", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "account", cascade = [CascadeType.ALL],
+        orphanRemoval = true,fetch = FetchType.LAZY)
     val userRoles: MutableSet<UserRole> = mutableSetOf()
 ){
     constructor(id: UUID,email: String,username: String) :

@@ -1,6 +1,7 @@
 package com.church.service
 
 
+import com.church.exception.ApiException
 import com.church.model.account.Account
 import com.church.model.account.RoleType
 import com.church.model.account.UserRole
@@ -81,7 +82,7 @@ class AuthenticationService(
             val roles = userAccountDetails.authorities
                 .map { it.authority.removePrefix("ROLE_") }
 
-           val refreshToken = createRefreshToken(authRequest.username);
+           val refreshToken = createRefreshToken(authRequest.username)
 
             return LoginResponse(
                 username = userAccountDetails.username,
@@ -95,7 +96,7 @@ class AuthenticationService(
     }
 
     private fun createRefreshToken(username: String): RefreshToken {
-        val expirationTimeMillis = System.currentTimeMillis() + 60 * 60 * 1000
+        val expirationTimeMillis = System.currentTimeMillis() + 60 * 60 * 1000 * 50
 
         val account = accountRepository.findByUsername(username)
             ?: throw BadCredentialsException("Invalid credentials")
@@ -110,28 +111,33 @@ class AuthenticationService(
         return refreshTokenRepository.save(refreshToken)
     }
 
-    fun generateAccessTokenFromRefreshToken(user:User,request: RefreshTokenRequest): RefreshTokenResponse {
+    fun generateAccessTokenFromRefreshToken(request: RefreshTokenRequest): RefreshTokenResponse {
+
         val refreshToken = findByToken(request.token)
-            ?.let { verifyExpiration(it) }
-            ?: throw BadCredentialsException("Refresh token is invalid")
+        val tokenVerification = verifyExpiration(refreshToken)
+
+        val account = accountRepository.findById(refreshToken.userId).orElseThrow { BadCredentialsException("Refresh token is invalid")}
+
+        val user = User(account,account.userRoles.toList())
 
         val accessToken = jwtUtils.generateToken(user)
 
         return RefreshTokenResponse(
             accessToken = accessToken,
-            refreshToken = request.token
+            refreshToken = request.token,
+            expiresIn = tokenVerification.expiresAt
         )
     }
 
     private fun findByToken(token: String): RefreshToken {
-        return refreshTokenRepository.findByToken(token)?: throw BadCredentialsException("Refresh token is invalid")
+        return refreshTokenRepository.findByToken(token)?: throw ApiException("Refresh token is invalid!!!!")
     }
 
     private fun verifyExpiration(token: RefreshToken): RefreshToken {
         token.expiresAt?.let {
             if (it < System.currentTimeMillis()) {
                 refreshTokenRepository.delete(token)
-                throw BadCredentialsException("Refresh token ${token.token} was expired")
+                throw ApiException("Refresh token ${token.token} was expired")
             }
         }
         return token

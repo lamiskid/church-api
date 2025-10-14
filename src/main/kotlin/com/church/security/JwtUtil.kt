@@ -1,11 +1,10 @@
 package com.church.security
 
-import com.church.model.account.Account
+
 import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
-import java.nio.charset.StandardCharsets
 import java.security.Key
 import java.util.*
 
@@ -33,7 +32,7 @@ class JwtUtil {
             .map { it.authority.replaceFirst("^ROLE_".toRegex(), "") }
 
         val claims = mapOf(
-           // "userId" to user.getId(),
+            "userId" to user.getId(),
             "roles" to roles
         )
 

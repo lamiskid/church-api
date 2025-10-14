@@ -17,10 +17,7 @@ class CustomUserDetailsService(
     override fun loadUserByUsername(username: String): UserDetails {
         val user = accountRepository.findByUsername(username)
             ?: throw UsernameNotFoundException("User not found")
-
-        if (user.id == null) throw UsernameNotFoundException("User not found")
-
-        val accountRoles = roleRepository.findAccountRoles(user.id!!)
+        val accountRoles = roleRepository.findAccountRoles(user.id)
         return User(user, accountRoles)
     }
 }

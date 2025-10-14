@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.core.AuthenticationException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
@@ -35,7 +34,7 @@ import org.springframework.web.filter.CorsFilter
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val customUserDetailsService: CustomUserDetailsService,
-    private val objectMapper : ObjectMapper
+    private val objectMapper: ObjectMapper
 ) {
 
     @Bean
@@ -53,25 +52,36 @@ class SecurityConfig(
             }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers(HttpMethod.POST, "/api/auth/register",
-                        "/api/auth/login","/api/cent/publish","http://localhost:8000/api/publish").permitAll()
-                    .requestMatchers("/google-login", "https://accounts.google.com/o/oauth2/auth").permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST, "/api/auth/register",
+                        "/api/auth/login","/api/auth/refresh",
+                        "/api/cent/publish", "http://localhost:8000/api/publish")
+                    .permitAll()
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**"
+                    ).permitAll()
+                    .requestMatchers("/google-login", "https://accounts.google.com/o/oauth2/auth")
+                    .permitAll()
                     .anyRequest().authenticated()
             }
             .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter::class.java
+            )
             .exceptionHandling { ex ->
                 ex.authenticationEntryPoint(authenticationEntryPoint())
-                ex.accessDeniedHandler(accessDeniedHandler())}
-
-
+                ex.accessDeniedHandler(accessDeniedHandler())
+            }
         return http.build()
     }
 
- /*   @Bean
-    fun jwtDecoder(): JwtDecoder {
-        return NimbusJwtDecoder.withJwkSetUri("https://www.googleapis.com/oauth2/v3/certs").build()
-    }*/
+    /*   @Bean
+       fun jwtDecoder(): JwtDecoder {
+           return NimbusJwtDecoder.withJwkSetUri("https://www.googleapis.com/oauth2/v3/certs").build()
+       }*/
 
     @Bean
     fun corsFilter(): CorsFilter {
@@ -95,12 +105,12 @@ class SecurityConfig(
     fun authenticationEntryPoint(): AuthenticationEntryPoint {
         return AuthenticationEntryPoint { request: HttpServletRequest, response: HttpServletResponse, authException ->
             response.contentType = "application/json"
-            response.status = HttpStatus.FORBIDDEN.value()
+            response.status = HttpStatus.UNAUTHORIZED.value()
             val body = mapOf(
                 "error" to "Unauthorized",
-                "message" to authException.message,
-                "status" to HttpStatus.FORBIDDEN.value(),
-                "path" to request.requestURI
+                "status" to HttpStatus.UNAUTHORIZED.value(),
+                "path" to request.requestURI,
+                "message" to (authException.message ?: "Unauthorized"),
             )
             response.writer.write(objectMapper.writeValueAsString(body))
         }

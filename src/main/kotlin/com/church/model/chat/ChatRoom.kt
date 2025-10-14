@@ -36,6 +36,5 @@ data class ChatRoom(
         inverseJoinColumns = [JoinColumn(name = "user_id")]
     )
     val participants: MutableSet<Account> = mutableSetOf()
-
 )
 

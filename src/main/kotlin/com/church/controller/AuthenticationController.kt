@@ -36,9 +36,8 @@ class AuthenticationController(
 
     @PostMapping("/refresh")
     fun refreshAuthenticationToken(
-        @AuthenticationPrincipal user: User,
         @RequestBody refreshTokenRequest: RefreshTokenRequest
     ): ResponseEntity<RefreshTokenResponse> {
-        return ResponseEntity.ok(authService.generateAccessTokenFromRefreshToken(user,refreshTokenRequest))
+        return ResponseEntity.ok(authService.generateAccessTokenFromRefreshToken(refreshTokenRequest))
     }
 }

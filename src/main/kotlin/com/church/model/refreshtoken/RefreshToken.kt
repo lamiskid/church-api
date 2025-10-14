@@ -25,7 +25,7 @@ data class RefreshToken(
     val createdAt: Long,
 
     @Column(name = "user_id", nullable = false)
-    val userId: UUID?
+    val userId: UUID
 )
 
 
