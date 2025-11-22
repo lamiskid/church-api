@@ -7,7 +7,7 @@ import java.util.UUID
 @Table(name = "sermons")
 data class Sermon(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
 
     @Column(nullable = false)

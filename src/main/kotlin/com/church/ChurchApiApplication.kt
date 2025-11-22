@@ -21,25 +21,28 @@ class ChurchApiApplication(
 ):CommandLineRunner {
 	override fun run(vararg args: String?) {
 		if (accountRepository.existsByUsername("admin")) {
-			throw UsernameNotFoundException("Username already exists")
+			println("Username already initialize")
+			//throw UsernameNotFoundException("Username already exists")
+		}else{
+
+			val account = Account(
+				email = "admin@email.com",
+				username = "admin",
+				firstName = "admin",
+				lastName = "pastor",
+				password = passwordEncoder.encode("admin")
+			)
+
+			val savedAccount = accountRepository.save(account)
+
+			val userRole = UserRole(
+				roleType = RoleType.ADMIN,
+				account = savedAccount
+			)
+
+			userRoleRepository.save(userRole)
 		}
 
-		val account = Account(
-			email = "admin@email.com",
-			username = "admin",
-			firstName = "admin",
-			lastName = "pastor",
-			password = passwordEncoder.encode("admin")
-		)
-
-		val savedAccount = accountRepository.save(account)
-
-		val userRole = UserRole(
-			roleType = RoleType.ADMIN,
-			account = savedAccount
-		)
-
-		userRoleRepository.save(userRole)
 	}
 }
 
