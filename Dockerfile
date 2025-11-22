@@ -4,7 +4,7 @@ FROM gradle:8.7-jdk21-alpine AS builder
 WORKDIR /app
 
 COPY gradle/ ./gradle
-COPY gradle.properties settings.gradle.kts build.gradle.kts ./
+COPY centrifugo settings.gradle.kts build.gradle.kts ./
 
 RUN gradle dependencies --no-daemon || true
 
