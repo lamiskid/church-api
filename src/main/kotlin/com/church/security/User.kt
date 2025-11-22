@@ -16,7 +16,7 @@ class User(
 ) : UserDetails {
 
     constructor(user: Account, roles: List<UserRole>) : this(
-        userId = user.id,
+        userId = user.id!!,
         username = user.username,
         password = user.password,
         email = user.email,

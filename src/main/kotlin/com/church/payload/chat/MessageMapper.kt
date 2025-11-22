@@ -7,7 +7,7 @@ fun Message.toResponse(): MessageResponse =
     MessageResponse(
         id = id,
         chatRoomId = chatRoom.id,
-        senderId = sender.id,
+        senderId = sender.id!!,
         senderName = sender.username,
         content = content,
         createdAt = createdAt
@@ -20,7 +20,7 @@ fun ChatRoom.toResponse(): ChatRoomResponse =
         name = name,
         type = type,
         channelId = channelId,
-        participants = participants.map { UserSummary(it.id, it.username) },
+        participants = participants.map { UserSummary(requireNotNull( it.id), it.username) },
         lastMessage = null
     )
 

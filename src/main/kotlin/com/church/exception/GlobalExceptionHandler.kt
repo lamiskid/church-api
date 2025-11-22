@@ -75,7 +75,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException::class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     fun handleBadCredentialsException(
         exception: UsernameNotFoundException,
@@ -110,7 +110,7 @@ class GlobalExceptionHandler {
     ): ErrorResponse {
         return ErrorResponse(
             httpStatus = HttpStatus.UNAUTHORIZED,
-            message = "Authentication is required",
+            message = "Invalid Credential",
             path = request.requestURI,
 
         )

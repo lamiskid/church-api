@@ -1,5 +1,6 @@
 package com.church.security
 
+import com.church.exception.ApiException
 import com.church.repository.AccountRepository
 import com.church.repository.UserRoleRepository
 
@@ -15,9 +16,9 @@ class CustomUserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = accountRepository.findByUsername(username)
-            ?: throw UsernameNotFoundException("User not found")
-        val accountRoles = roleRepository.findAccountRoles(user.id)
-        return User(user, accountRoles)
+        val account = accountRepository.findByUsername(username)
+            ?: throw ApiException("User not found")
+        val accountRoles = roleRepository.findAccountRoles(account.id!!)
+        return User(account, accountRoles)
     }
 }

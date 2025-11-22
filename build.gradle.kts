@@ -28,13 +28,20 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 	//spring doc
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0")
+	//Firebase
+	implementation("com.google.firebase:firebase-admin:9.5.0")
+	//mail
+	implementation("org.springframework.boot:spring-boot-starter-mail")
+	//s3 bucket
+	implementation("software.amazon.awssdk:s3:2.36.0")
 
-
+	implementation("org.springframework.retry:spring-retry")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

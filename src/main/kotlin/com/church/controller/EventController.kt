@@ -43,6 +43,7 @@ class EventController(
     ): ResponseEntity<EventResponse> =
         ResponseEntity.ok(eventService.updateEvent(id, request))
 
+    @PreAuthorize("hasAnyRole('PASTOR','ADMIN')")
     @DeleteMapping("/{id}")
     fun deleteEvent(@PathVariable id: Long): ResponseEntity<Void> {
         eventService.deleteEvent(id)
@@ -55,6 +56,7 @@ class EventController(
         @RequestBody request: EventAttendanceRequest
     ): ResponseEntity<EventAttendanceResponse> =
         ResponseEntity.ok(eventService.rsvp(request.copy(eventId = id)))
+
 
     @GetMapping("/{id}/attendances")
     fun getAttendancesForEvent(@PathVariable id: Long): ResponseEntity<List<EventAttendanceResponse>> =

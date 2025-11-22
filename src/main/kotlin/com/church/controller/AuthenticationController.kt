@@ -11,10 +11,7 @@ import com.church.service.AuthenticationService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -40,4 +37,77 @@ class AuthenticationController(
     ): ResponseEntity<RefreshTokenResponse> {
         return ResponseEntity.ok(authService.generateAccessTokenFromRefreshToken(refreshTokenRequest))
     }
+
+
+    @PostMapping("/resend-verification-token")
+    fun resendVerificationToken(@RequestParam email: String): ResponseEntity<String> {
+        authService.resendVerificationToken(email)
+        return ResponseEntity.ok("Verification token resent to $email")
+    }
+
+
+   /* @GetMapping("/verify")
+    fun verifyEmail(@RequestParam token: String): ResponseEntity<String> {
+        val verificationToken = verificationTokenRepo.findByToken(token)
+            ?: return ResponseEntity.badRequest().body("Invalid token")
+
+        if (verificationToken.expiryDate.isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body("Token expired")
+        }
+
+        val user = verificationToken.user
+        user.enabled = true
+        userRepository.save(user)
+        verificationTokenRepo.delete(verificationToken)
+
+        return ResponseEntity.ok("Email verified successfully")
+    }
+
+
+    @PostMapping("/reset-password-request")
+    fun requestPasswordReset(@RequestParam email: String): ResponseEntity<String> {
+        val user = userRepository.findByEmail(email)
+            ?: return ResponseEntity.badRequest().body("No user with that email")
+
+        val token = UUID.randomUUID().toString()
+        val resetToken = PasswordResetToken(
+            token = token,
+            user = user,
+            expiryDate = LocalDateTime.now().plusHours(1)
+        )
+        passwordResetTokenRepo.save(resetToken)
+
+        val resetUrl = "http://localhost:8080/api/reset-password?token=$token"
+        emailService.sendEmail(email, "Reset Password", "Click: $resetUrl")
+
+        return ResponseEntity.ok("Password reset email sent")
+    }
+
+
+
+
+
+    @PostMapping("/reset-password")
+    fun resetPassword(
+        @RequestParam token: String,
+        @RequestParam newPassword: String
+    ): ResponseEntity<String> {
+        val resetToken = passwordResetTokenRepo.findByToken(token)
+            ?: return ResponseEntity.badRequest().body("Invalid token")
+
+        if (resetToken.expiryDate.isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body("Token expired")
+        }
+
+        val user = resetToken.user
+        user.password = passwordEncoder.encode(newPassword)
+        userRepository.save(user)
+        passwordResetTokenRepo.delete(resetToken)
+
+        return ResponseEntity.ok("Password successfully reset")
+    }*/
+
+
+
+
 }

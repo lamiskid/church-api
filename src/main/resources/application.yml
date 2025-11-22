@@ -29,6 +29,22 @@ spring:
       max-in-memory-size: 16MB
 
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your_email@gmail.com
+    password: your_app_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+
 
 
 server:
@@ -37,10 +53,22 @@ server:
 # Logging
 logging:
   level:
-    org.springframework.jdbc.core: off
-    org.springframework.jdbc.core.simple: off
+    org.springframework.jdbc.core: trace
+    org.springframework.jdbc.core.simple: trace
 
 
 centrifugo:
   api-url: http://localhost:8000/api
   api-key: my_api_key
+
+
+
+aws:
+  access-key: ${S3_ACCESS_KEY_ID}
+  secret-key: ${S3_SECRET_ACCESS_KEY}
+  region: us-east-1
+  bucket-name: church-app-media
+
+
+
+

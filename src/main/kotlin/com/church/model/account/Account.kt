@@ -8,9 +8,9 @@ class Account(
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID? = null,
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, precision = 1)
     val email:String,
     val username:String,
     val password:String,
@@ -26,9 +26,13 @@ class Account(
 
     @OneToMany(mappedBy = "account", cascade = [CascadeType.ALL],
         orphanRemoval = true,fetch = FetchType.LAZY)
-    val userRoles: MutableSet<UserRole> = mutableSetOf()
+    val userRoles: MutableSet<UserRole> = mutableSetOf(),
+
+    @Version
+    @Column(name = "version")
+    var version: Long? = 0
+
 ){
     constructor(id: UUID,email: String,username: String) :
             this(id,email,username,"","","")
-
 }

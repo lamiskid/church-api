@@ -5,7 +5,7 @@ import java.util.UUID
 data class MessageResponse(
     val id: Long,
     val chatRoomId: Long,
-    val senderId: UUID,
+    val senderId: UUID? = null,
     val senderName: String,
     val content: String,
     val createdAt: Long

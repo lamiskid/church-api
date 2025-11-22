@@ -5,8 +5,6 @@ import com.church.exception.ResourceNotFoundException
 import com.church.model.account.Account
 import com.church.model.chat.ChatRoom
 import com.church.model.chat.Message
-import com.church.payload.centrifugo.CentrifugoEvent
-import com.church.payload.centrifugo.MessagePayload
 import com.church.payload.chat.AddParticipantRequest
 import com.church.payload.chat.ChatRoomResponse
 import com.church.payload.chat.CreateChatRoomRequest
@@ -17,6 +15,9 @@ import com.church.repository.AccountRepository
 import com.church.repository.ChatRoomRepository
 import com.church.repository.MessageRepository
 import com.church.security.User
+import com.church.util.FcmServiceUtil
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -27,7 +28,8 @@ class ChatService(
     private val accountRepository: AccountRepository,
     private val chatRoomRepository: ChatRoomRepository,
     private val messageRepository: MessageRepository,
-    private val centrifugoService: CentrifugoService
+    private val centrifugoService: CentrifugoService,
+    private val fcmServiceUtil: FcmServiceUtil
 ) {
 
     @Transactional
@@ -44,15 +46,15 @@ class ChatService(
             content = request.content
         )
 
-        val savedMessage = messageRepository.save(message)
-        val response = savedMessage.toResponse()
+       // val savedMessage = messageRepository.save(message)
+       // val response = savedMessage.toResponse()
 
-        val event = CentrifugoEvent(
+     /*   val event = CentrifugoEvent(
             type = "NEW_MESSAGE",
             payload = MessagePayload(
                 id = savedMessage.id,
                 chatRoomId = chatRoom.id,
-                senderId = account.id,
+                senderId = account.id!!,
                 senderName = account.username,
                 content = savedMessage.content,
                 createdAt = savedMessage.createdAt
@@ -61,17 +63,35 @@ class ChatService(
         val event2 = MessagePayload(
             id = savedMessage.id,
             chatRoomId = chatRoom.id,
-            senderId = account.id,
+            senderId = account.id!!,
             senderName = account.username,
             content = savedMessage.content,
             createdAt = savedMessage.createdAt
+        )*/
+        //centrifugoService.publish(/*chatRoom.channelId*/"channel", event2)
+        fcmServiceUtil.sendPushNotification(
+            fcmToken = "c7ptNxt2RNKLdq2OxPFHvZ:APA91bF6FMrvZ95fggllsBQwDcmqbQ14c8-69mpz0bXtmAaF5Pl1N3GvF7KOr4QrOyDNylbNNKjSIVAYyqabALtnFK2MBDD221cal0s2_vmT3PYKz09VmzY",
+            title = "New message from ${account.username}",
+            body = "Hello",
+            data = mapOf("eventType" to "NEW_MESSAGE","eventRouteId" to chatRoom.id.toString(),)
         )
-        centrifugoService.publish(/*chatRoom.channelId*/"channel", event2)
-        return response
+        return MessageResponse(
+            id = 1,
+            chatRoomId = 1,
+            senderName = "",
+            senderId = null,
+            createdAt = 11,
+            content = ""
+        )
     }
 
     fun getMessages(chatRoomId: Long): List<MessageResponse> {
         val messages = messageRepository.findAllByChatRoomIdOrderByCreatedAtAsc(chatRoomId)
+        return messages.map { it.toResponse() }
+    }
+
+    fun getMessagesV2(chatRoomId: Long, pageable: Pageable): Page<MessageResponse> {
+        val messages = messageRepository.findAllByChatRoomIdOrderByCreatedAtAsc(chatRoomId,pageable)
         return messages.map { it.toResponse() }
     }
 
@@ -113,8 +133,8 @@ class ChatService(
         val room = chatRoomRepository.findById(roomId)
             .orElseThrow { IllegalArgumentException("Chat room not found") }
 
-        val users = accountRepository.findAllById(request.userIds)
-        room.participants.addAll(users)
+        val account = accountRepository.findAllById(request.accountIds)
+        room.participants.addAll(account)
         chatRoomRepository.save(room)
     }
 

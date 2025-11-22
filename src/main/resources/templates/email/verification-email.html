@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Verification</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px;">
+<div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px;">
+  <h2 style="color: #333;">Welcome, <span th:text="${username}">User</span>!</h2>
+  <p>Thanks for registering with us. Please verify your email by clicking the button below:</p>
+
+  <p style="text-align: center;">
+    <a th:href="${verificationUrl}" style="display: inline-block; padding: 12px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+      Verify Email
+    </a>
+  </p>
+
+  <p>If the button doesn't work, copy and paste the following URL into your browser:</p>
+  <p><a th:text="${verificationUrl}" th:href="${verificationUrl}"></a></p>
+
+  <hr/>
+  <p style="font-size: 12px; color: #aaa;">If you didn’t create an account, you can ignore this email.</p>
+</div>
+</body>
+</html>

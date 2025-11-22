@@ -6,6 +6,7 @@ import com.church.model.account.Account
 import com.church.model.account.RoleType
 import com.church.model.account.UserRole
 import com.church.model.refreshtoken.RefreshToken
+import com.church.model.verification.VerificationToken
 import com.church.payload.LoginRequest
 import com.church.payload.LoginResponse
 import com.church.payload.RegisterRequest
@@ -14,8 +15,10 @@ import com.church.payload.refreshtoken.RefreshTokenResponse
 import com.church.repository.AccountRepository
 import com.church.repository.RefreshTokenRepository
 import com.church.repository.UserRoleRepository
+import com.church.repository.VerificationTokenRepository
 import com.church.security.JwtUtil
 import com.church.security.User
+import com.church.util.EmailUtil
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -24,6 +27,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -33,7 +37,9 @@ class AuthenticationService(
     private val accountRepository: AccountRepository,
     private val userRoleRepository: UserRoleRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val jwtUtils: JwtUtil
+    private val jwtUtils: JwtUtil,
+    private val emailUtil: EmailUtil,
+    private val verificationTokenRepository: VerificationTokenRepository
 )
 {
 
@@ -43,23 +49,23 @@ class AuthenticationService(
             throw UsernameNotFoundException("Username already exists")
         }
 
-        val account = Account(
-            email = registerRequest.email,
-            username = registerRequest.username,
-            firstName = registerRequest.firstName,
-            lastName = registerRequest.lastName,
-            password = passwordEncoder.encode(registerRequest.password)
+            val account = Account(
+                email = registerRequest.email,
+                username = registerRequest.username,
+                firstName = registerRequest.firstName,
+                lastName = registerRequest.lastName,
+                password = passwordEncoder.encode(registerRequest.password)
+            )
 
-        )
+            val savedAccount = accountRepository.save(account)
 
-        val savedAccount = accountRepository.save(account)
-
-        val userRole = UserRole(
-            roleType = RoleType.USER,
-            account = savedAccount
-        )
+            val userRole = UserRole(
+                roleType = RoleType.USER,
+                account = savedAccount
+            )
 
         userRoleRepository.save(userRole)
+        resendVerificationToken(registerRequest.email)
     }
 
     fun login(authRequest: LoginRequest): LoginResponse {
@@ -102,7 +108,7 @@ class AuthenticationService(
             ?: throw BadCredentialsException("Invalid credentials")
 
         val refreshToken = RefreshToken(
-            userId = account.id,
+            userId = account.id!!,
             token = UUID.randomUUID().toString(),
             expiresAt = expirationTimeMillis,
             createdAt = System.currentTimeMillis()
@@ -141,5 +147,27 @@ class AuthenticationService(
             }
         }
         return token
+    }
+
+
+    fun resendVerificationToken(email: String) {
+        val token = generateToken()
+        val expiration = LocalDateTime.now().plusMinutes(10)
+
+        verificationTokenRepository.save(
+            VerificationToken(
+                token = token,
+                email = email,
+                expiresAt = expiration
+            )
+        )
+
+        emailUtil.sendVerificationEmail(email, token, generateToken())
+    }
+
+    private fun generateToken(): String {
+        return (1..5)
+            .map { (0..9).random() }
+            .joinToString("")
     }
 }
