@@ -14,16 +14,18 @@ class FirebaseConfig {
     @PostConstruct
     fun init() {
         val serviceAccountJson = System.getenv("FIREBASE_SERVICE_ACCOUNT")
-            ?: throw RuntimeException("FIREBASE_SERVICE_ACCOUNT env variable not set")
-        val serviceAccount = ByteArrayInputStream(serviceAccountJson.toByteArray())
+        if (serviceAccountJson != null){
+            val serviceAccount = ByteArrayInputStream(serviceAccountJson.toByteArray())
+            val options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build()
+
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options)
+            }
+        }
+
         //val serviceAccount = System.getenv("FIREBASE_SERVICE_ACCOUNT")?: FileInputStream("src/main/resources/serviceAccountKey.json")
 
-        val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build()
-
-        if (FirebaseApp.getApps().isEmpty()) {
-            FirebaseApp.initializeApp(options)
-        }
     }
 }
