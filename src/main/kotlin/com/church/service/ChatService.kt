@@ -3,21 +3,19 @@ package com.church.service
 
 import com.church.exception.ResourceNotFoundException
 import com.church.model.account.Account
+import com.church.model.account.UserRole
 import com.church.model.chat.ChatRoom
 import com.church.model.chat.Message
-import com.church.payload.chat.AddParticipantRequest
-import com.church.payload.chat.ChatRoomResponse
-import com.church.payload.chat.CreateChatRoomRequest
-import com.church.payload.chat.MessageRequest
-import com.church.payload.chat.MessageResponse
-import com.church.payload.chat.toResponse
+import com.church.payload.chat.*
+import com.church.payload.pagination.PageResponse
+import com.church.payload.pagination.PaginationMapper
+import com.church.payload.profile.UserProfileDetails
 import com.church.repository.AccountRepository
 import com.church.repository.ChatRoomRepository
 import com.church.repository.MessageRepository
 import com.church.security.User
 import com.church.util.FcmServiceUtil
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -46,7 +44,7 @@ class ChatService(
             content = request.content
         )
 
-       // val savedMessage = messageRepository.save(message)
+        val savedMessage = messageRepository.save(message)
        // val response = savedMessage.toResponse()
 
      /*   val event = CentrifugoEvent(
@@ -69,19 +67,19 @@ class ChatService(
             createdAt = savedMessage.createdAt
         )*/
         //centrifugoService.publish(/*chatRoom.channelId*/"channel", event2)
-        fcmServiceUtil.sendPushNotification(
+     /*   fcmServiceUtil.sendPushNotification(
             fcmToken = "c7ptNxt2RNKLdq2OxPFHvZ:APA91bF6FMrvZ95fggllsBQwDcmqbQ14c8-69mpz0bXtmAaF5Pl1N3GvF7KOr4QrOyDNylbNNKjSIVAYyqabALtnFK2MBDD221cal0s2_vmT3PYKz09VmzY",
             title = "New message from ${account.username}",
             body = "Hello",
             data = mapOf("eventType" to "NEW_MESSAGE","eventRouteId" to chatRoom.id.toString(),)
-        )
+        )*/
         return MessageResponse(
-            id = 1,
-            chatRoomId = 1,
-            senderName = "",
+            id =message.id,
+            chatRoomId = message.chatRoom.id,
+            senderName = account.email,
             senderId = null,
-            createdAt = 11,
-            content = ""
+            createdAt = message.createdAt,
+            content = message.content
         )
     }
 
@@ -97,7 +95,7 @@ class ChatService(
 
 
     @Transactional
-    fun createChatRoom(request: CreateChatRoomRequest, user: User ): ChatRoomResponse {
+    fun createChatRoom(request: CreateChatRoomRequest, user: User ): CreateChatRoomResponse {
         val participants = mutableSetOf<Account>().apply {
             add(accountRepository.getReferenceById(user.getId()))
             addAll(accountRepository.findAllById(request.participantIds))
@@ -107,7 +105,8 @@ class ChatService(
             name = request.name,
             type = request.type,
             channelId = UUID.randomUUID().toString(),
-            participants = participants
+            description = request.description,
+            participants = participants,
         )
 
         val saved = chatRoomRepository.save(chatRoom)
@@ -125,8 +124,32 @@ class ChatService(
         )
         centrifugoService.publish(saved.channelId, event)*/
 
-        return response
+        return CreateChatRoomResponse(
+            saved.name,
+            saved.description,
+            saved.type,
+        )
     }
+    fun getAllUsersForChatRoom(user: User, page: Int, size: Int): PageResponse<UserProfileDetails> {
+
+        val pageable: Pageable = PageRequest.of(page, size)
+
+        val pageResult = accountRepository.findAll(pageable)
+
+       // val filteredAccounts = pageResult.content.filter { it.id != user.getId() }
+
+        return PaginationMapper.toPageResponse(pageResult) { account ->
+            UserProfileDetails(
+                userId = account.id!!,
+                firstName = account.profile?.firstName ?: "",
+                lastName = account.profile?.lastName ?: "",
+                profilePictureUrl = account.profile?.profilePictureUrl,
+                role = account.userRoles.map { userRole -> userRole.roleType },
+            )
+        }
+    }
+
+
 
     @Transactional
     fun addParticipants(roomId: Long, request: AddParticipantRequest) {
@@ -150,6 +173,33 @@ class ChatService(
             room.toResponse(lastMessage)
         }
     }
+
+    fun listUserChatRooms(
+        user: User,
+        page: Int,
+        size: Int
+    ): Page<ChatRoomResponse> {
+
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"))
+
+        val roomsPage = chatRoomRepository.findAllByParticipantsId(
+            user.getId(),
+            pageable
+        )
+
+        val roomIds = roomsPage.content.map { it.id }
+
+        val latestMessages = messageRepository.findLatestMessagesByChatRoomIds(roomIds)
+            .associateBy { it.chatRoom.id }
+
+        val roomResponses = roomsPage.content.map { room ->
+            val lastMessage = latestMessages[room.id]
+            room.toResponse(lastMessage)
+        }
+
+        return PageImpl(roomResponses, pageable, roomsPage.totalElements)
+    }
+
 
 
 

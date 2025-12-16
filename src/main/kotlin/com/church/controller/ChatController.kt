@@ -1,12 +1,9 @@
 package com.church.controller
 
-import com.church.payload.chat.AddParticipantRequest
-import com.church.payload.chat.ChatRoomResponse
-import com.church.payload.chat.CreateChatRoomRequest
-import com.church.payload.chat.MessageRequest
-import com.church.payload.chat.MessageResponse
+import com.church.payload.chat.*
 import com.church.payload.pagination.PageResponse
 import com.church.payload.pagination.PaginationMapper
+import com.church.payload.profile.UserProfileDetails
 import com.church.security.User
 import com.church.service.ChatService
 import org.springframework.data.domain.Page
@@ -33,8 +30,18 @@ class ChatController(
     fun createChatRoom(
         @AuthenticationPrincipal user: User,
         @RequestBody request: CreateChatRoomRequest
-    ): ResponseEntity<ChatRoomResponse> {
+    ): ResponseEntity<CreateChatRoomResponse> {
         val response = chatService.createChatRoom(request, user)
+        return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/member")
+    fun getAllMembersChatRoom(
+        @AuthenticationPrincipal user: User,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ): ResponseEntity<PageResponse<UserProfileDetails>> {
+        val response = chatService.getAllUsersForChatRoom(user,page,size)
         return ResponseEntity.ok(response)
     }
 
@@ -82,5 +89,22 @@ class ChatController(
         return ResponseEntity.ok(dto)
     }
 
+
+    @GetMapping("/chatroom")
+    fun getChatRoomV2(
+        @AuthenticationPrincipal user: User,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ): ResponseEntity<PageResponse<ChatRoomResponse>> {
+        return ResponseEntity.ok(
+            PaginationMapper.toPageResponse(
+                chatService.listUserChatRooms(
+                    user,
+                    page,
+                    size
+                )
+            )
+        )
+    }
 
 }

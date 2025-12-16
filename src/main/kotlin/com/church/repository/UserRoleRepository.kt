@@ -11,8 +11,8 @@ import java.util.UUID
 @Repository
 interface UserRoleRepository:JpaRepository<UserRole,Long> {
 
-    @Query(value = "SELECT * FROM user_role ur WHERE ur.user_id = :userId", nativeQuery = true)
-    fun findAccountRoles(@Param("userId") userId: UUID): List<UserRole>
+    @Query(value = "SELECT * FROM user_role ur WHERE ur.account_id = :accountId", nativeQuery = true)
+    fun findAccountRoles(@Param("accountId") accountId: UUID): List<UserRole>
 
   /*  @Query("SELECT ur FROM UserRole ur WHERE ur.account.id = :userId")
     fun findAccountRoles(@Param("userId") userId: UUID): List<UserRole>*/

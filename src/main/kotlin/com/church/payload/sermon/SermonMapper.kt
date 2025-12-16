@@ -10,5 +10,6 @@ fun Sermon.toResponseDto(): SermonResponse = SermonResponse(
     preacher = preacher,
     createdBy = createdBy,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    medialUrl = media?.mediaUrl
 )

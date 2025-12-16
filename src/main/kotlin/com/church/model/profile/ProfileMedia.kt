@@ -1,8 +1,7 @@
 package com.church.model.profile
 
-import com.church.model.account.Account
 import jakarta.persistence.*
-import jakarta.persistence.GenerationType.*
+import jakarta.persistence.GenerationType.IDENTITY
 
 
 @Entity
@@ -15,12 +14,14 @@ data class ProfileMedia(
     @Enumerated(EnumType.STRING)
     val type:MediaType = MediaType.IMAGE,
 
-    @ManyToOne
-    val account: Account,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", nullable = false)
+    val profile: Profile,
 
     @Column(nullable = false, columnDefinition = "TEXT")
     val signedUploadUrl:String,
 
+    @Column(columnDefinition = "TEXT")
     val mediaUrl:String,
 
     @Column(nullable = false)

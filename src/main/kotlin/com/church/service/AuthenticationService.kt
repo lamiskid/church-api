@@ -45,15 +45,11 @@ class AuthenticationService(
 
     @Transactional
     fun register(registerRequest: RegisterRequest) {
-        if (accountRepository.existsByUsername(registerRequest.username)) {
-            throw UsernameNotFoundException("Username already exists")
+        if (accountRepository.existsByEmail(registerRequest.email)) {
+            throw UsernameNotFoundException("Email already exists")
         }
-
             val account = Account(
                 email = registerRequest.email,
-                username = registerRequest.username,
-                firstName = registerRequest.firstName,
-                lastName = registerRequest.lastName,
                 password = passwordEncoder.encode(registerRequest.password)
             )
 
@@ -72,7 +68,7 @@ class AuthenticationService(
         val authentication = try {
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(
-                    authRequest.username,
+                    authRequest.email,
                     authRequest.password
                 )
             )
@@ -88,7 +84,7 @@ class AuthenticationService(
             val roles = userAccountDetails.authorities
                 .map { it.authority.removePrefix("ROLE_") }
 
-           val refreshToken = createRefreshToken(authRequest.username)
+           val refreshToken = createRefreshToken(authRequest.email)
 
             return LoginResponse(
                 username = userAccountDetails.username,
@@ -101,21 +97,7 @@ class AuthenticationService(
         }
     }
 
-    private fun createRefreshToken(username: String): RefreshToken {
-        val expirationTimeMillis = System.currentTimeMillis() + 60 * 60 * 1000 * 50
 
-        val account = accountRepository.findByUsername(username)
-            ?: throw BadCredentialsException("Invalid credentials")
-
-        val refreshToken = RefreshToken(
-            userId = account.id!!,
-            token = UUID.randomUUID().toString(),
-            expiresAt = expirationTimeMillis,
-            createdAt = System.currentTimeMillis()
-        )
-
-        return refreshTokenRepository.save(refreshToken)
-    }
 
     fun generateAccessTokenFromRefreshToken(request: RefreshTokenRequest): RefreshTokenResponse {
 
@@ -147,6 +129,22 @@ class AuthenticationService(
             }
         }
         return token
+    }
+
+    private fun createRefreshToken(email: String): RefreshToken {
+        val expirationTimeMillis = System.currentTimeMillis() + 60 * 60 * 1000 * 50
+
+        val account = accountRepository.findByEmail(email)
+            ?: throw BadCredentialsException("Invalid credentials")
+
+        val refreshToken = RefreshToken(
+            userId = account.id!!,
+            token = UUID.randomUUID().toString(),
+            expiresAt = expirationTimeMillis,
+            createdAt = System.currentTimeMillis()
+        )
+
+        return refreshTokenRepository.save(refreshToken)
     }
 
 

@@ -10,5 +10,6 @@ data class SermonResponse(
     val preacher: String,
     val createdBy: UUID,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime?
+    val updatedAt: LocalDateTime?,
+    val medialUrl: String?
 )

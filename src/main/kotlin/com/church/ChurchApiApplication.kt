@@ -20,16 +20,13 @@ class ChurchApiApplication(
 	private val passwordEncoder: PasswordEncoder,
 ):CommandLineRunner {
 	override fun run(vararg args: String?) {
-		if (accountRepository.existsByUsername("admin")) {
+		if (accountRepository.existsByEmail("admin@email.com")) {
 			println("Username already initialize")
 			//throw UsernameNotFoundException("Username already exists")
 		}else{
 
 			val account = Account(
 				email = "admin@email.com",
-				username = "admin",
-				firstName = "admin",
-				lastName = "pastor",
 				password = passwordEncoder.encode("admin")
 			)
 

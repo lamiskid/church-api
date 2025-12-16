@@ -1,6 +1,8 @@
 package com.church.model.account
 
+import com.church.model.profile.Profile
 import jakarta.persistence.*
+import jakarta.validation.constraints.Email
 import java.util.UUID
 
 @Entity
@@ -10,13 +12,11 @@ class Account(
     @Column(name = "id", updatable = false, nullable = false)
     val id: UUID? = null,
 
-    @Column(nullable = false, unique = true, precision = 1)
+    @Column(nullable = false, unique = true)
     val email:String,
-    val username:String,
+
+    @Column(nullable = false)
     val password:String,
-    val firstName:String,
-    val lastName:String,
-    val profilePicture: String? = null,
 
     @Column(name = "created_at", nullable = false)
     val createdAt: Long = System.currentTimeMillis(),
@@ -24,15 +24,15 @@ class Account(
     @Column(name = "updated_at", nullable = false)
     val updatedAt: Long =System.currentTimeMillis(),
 
+    @OneToOne(mappedBy = "account", cascade = [CascadeType.ALL],
+        fetch = FetchType.LAZY)
+    val profile: Profile? = null,
+
     @OneToMany(mappedBy = "account", cascade = [CascadeType.ALL],
         orphanRemoval = true,fetch = FetchType.LAZY)
     val userRoles: MutableSet<UserRole> = mutableSetOf(),
 
-    @Version
-    @Column(name = "version")
-    var version: Long? = 0
-
 ){
-    constructor(id: UUID,email: String,username: String) :
-            this(id,email,username,"","","")
+    constructor(id: UUID,email: String) :
+            this(id,email,"")
 }

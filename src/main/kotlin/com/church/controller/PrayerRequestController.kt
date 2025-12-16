@@ -34,10 +34,6 @@ class PrayerRequestController(
     ): ResponseEntity<PrayerRequestResponse> {
         val newRequest = prayerRequestService.createPrayerRequest(
             user,createPrayerRequest)
-
-        // Push real-time update to Centrifugo “prayers” channel
-       // centrifugoService.publishPrayerCreated(newRequest)
-
         return ResponseEntity.ok(newRequest)
     }
 
@@ -63,7 +59,7 @@ class PrayerRequestController(
     @PutMapping("/{id}/approve")
     @PreAuthorize("hasAnyRole('PASTOR','ADMIN')")
     fun approvePrayer(
-        @PathVariable id: UUID,
+        @PathVariable id: Long,
         @AuthenticationPrincipal user: User
     ): ResponseEntity<PrayerRequestResponse> {
         val approvedPrayer = prayerRequestService.approvePrayerRequest(id)

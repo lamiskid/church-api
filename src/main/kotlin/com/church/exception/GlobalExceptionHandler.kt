@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -15,7 +16,6 @@ import org.springframework.web.servlet.NoHandlerFoundException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
-
 
 
     @ExceptionHandler(ApiException::class)
@@ -27,7 +27,7 @@ class GlobalExceptionHandler {
             httpStatus = ex.status,
             message = ex.message,
             path = request.requestURI,
-           // errorCode = ex.errorCode
+            // errorCode = ex.errorCode
         )
         return ResponseEntity.status(ex.status).body(response)
     }
@@ -53,7 +53,8 @@ class GlobalExceptionHandler {
     @ResponseBody
     fun handleResourceNotFoundException(
         exception: ResourceNotFoundException,
-        request: HttpServletRequest): ErrorResponse {
+        request: HttpServletRequest
+    ): ErrorResponse {
         return ErrorResponse(
             message = exception.message,
             httpStatus = HttpStatus.NOT_FOUND,
@@ -66,7 +67,8 @@ class GlobalExceptionHandler {
     @ResponseBody
     fun handleUsernameNotFoundException(
         exception: UsernameNotFoundException,
-        request: HttpServletRequest): ErrorResponse {
+        request: HttpServletRequest
+    ): ErrorResponse {
         return ErrorResponse(
             message = exception.message,
             httpStatus = HttpStatus.NOT_FOUND,
@@ -79,7 +81,8 @@ class GlobalExceptionHandler {
     @ResponseBody
     fun handleBadCredentialsException(
         exception: UsernameNotFoundException,
-        request: HttpServletRequest): ErrorResponse {
+        request: HttpServletRequest
+    ): ErrorResponse {
         return ErrorResponse(
             message = exception.message,
             httpStatus = HttpStatus.NOT_FOUND,
@@ -92,7 +95,8 @@ class GlobalExceptionHandler {
     @ResponseBody
     fun handleJwtException(
         exception: ExpiredJwtException,
-        request: HttpServletRequest): ErrorResponse {
+        request: HttpServletRequest
+    ): ErrorResponse {
         return ErrorResponse(
             message = exception.message,
             httpStatus = HttpStatus.UNAUTHORIZED,
@@ -113,10 +117,10 @@ class GlobalExceptionHandler {
             message = "Invalid Credential",
             path = request.requestURI,
 
-        )
+            )
     }
 
-   @ExceptionHandler(NoHandlerFoundException::class)
+    @ExceptionHandler(NoHandlerFoundException::class)
     fun handleNotFound(ex: NoHandlerFoundException): ResponseEntity<Map<String, Any>> {
         val body = mapOf(
             "error" to "Not Found",
@@ -126,4 +130,14 @@ class GlobalExceptionHandler {
         return ResponseEntity(body, HttpStatus.NOT_FOUND)
     }
 
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun handleNotFound(ex: HttpRequestMethodNotSupportedException): ResponseEntity<Map<String, Any>> {
+        val body = mapOf(
+            "error" to "Not Found",
+            "message" to "Path '${ex.message}' not found",
+            "status" to HttpStatus.NOT_FOUND.value()
+        )
+        return ResponseEntity(body, HttpStatus.NOT_FOUND)
+    }
 }

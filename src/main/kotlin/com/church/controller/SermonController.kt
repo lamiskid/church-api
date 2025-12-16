@@ -23,11 +23,17 @@ class SermonController(
     private val s3ServiceUtil: S3ServiceUtil
 ) {
 
-    @PreAuthorize("hasAnyRole('PASTOR','ADMIN')")
+   // @PreAuthorize("hasAnyRole('PASTOR','ADMIN')")
     @PostMapping
-    fun createSermon(@AuthenticationPrincipal user: User, @RequestBody sermonRequest: SermonRequest): ResponseEntity<PresignedUploadResponse> {
-        val response = sermonService.createSermon(sermonRequest, user.getId())
+    fun createSermon(@AuthenticationPrincipal user: User, @RequestBody sermonRequest: SermonRequest): ResponseEntity<SermonResponse> {
+        val response = sermonService.createSermon(sermonRequest, user)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
+    }
+
+
+    @PostMapping("/media/upload-url")
+    fun getUploadUrl(@AuthenticationPrincipal user: User): PresignedUploadResponse {
+        return sermonService.generateUploadUrl(user.getId())
     }
 
     @PostMapping("/confirm-upload/{sermonId}")

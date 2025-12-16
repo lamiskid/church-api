@@ -1,9 +1,7 @@
-package com.church.model.prayerrequest
+package com.church.model.prayer
 
 import com.church.model.account.Account
 import jakarta.persistence.*
-import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 data class PrayerRequest(

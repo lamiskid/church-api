@@ -9,9 +9,14 @@ import com.church.payload.event.EventAttendanceResponse
 import com.church.payload.event.EventRequest
 import com.church.payload.event.EventResponse
 import com.church.payload.event.toResponse
+import com.church.payload.pagination.PageResponse
+import com.church.payload.pagination.PaginationMapper.toPageResponse
 import com.church.repository.AccountRepository
 import com.church.repository.EventAttendanceRepository
 import com.church.repository.EventRepository
+import com.church.security.User
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,13 +24,11 @@ import org.springframework.transaction.annotation.Transactional
 class EventService(
     private val eventRepository: EventRepository,
     private val eventAttendanceRepository: EventAttendanceRepository,
-    private val userRepository: AccountRepository // assumes you have one
+    private val userRepository: AccountRepository
 ) {
 
     @Transactional
-    fun createEvent(request: EventRequest): EventResponse {
-        val user = userRepository.findById(request.createdById)
-            .orElseThrow { IllegalArgumentException("User not found") }
+    fun createEvent(user: User, request: EventRequest): EventResponse {
 
         val event = Event(
             title = request.title,
@@ -34,14 +37,18 @@ class EventService(
             startTime = request.startTime,
             endTime = request.endTime,
             location = request.location,
-            createdBy = user
+            createdBy = user.toAccount(),
         )
 
         return eventRepository.save(event).toResponse()
     }
 
-    fun getAllEvents(): List<EventResponse> =
-        eventRepository.findAll().map { it.toResponse() }
+    fun getAllEvents(page: Int, size: Int): PageResponse<EventResponse> {
+        val pageable: Pageable = PageRequest.of(page, size)
+        val eventPage = eventRepository.findAll(pageable)
+        return toPageResponse(eventPage) { it.toResponse()}
+    }
+
 
     fun getEventById(eventId: Long): EventResponse =
         eventRepository.findById(eventId)

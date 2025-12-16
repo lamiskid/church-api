@@ -15,7 +15,7 @@ class UserRole(
     var roleType: RoleType,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false)
     var account: Account,
 
     @Column(name = "created_at", nullable = false)

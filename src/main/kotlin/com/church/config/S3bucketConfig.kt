@@ -56,7 +56,7 @@ class S3bucketConfig(
         return S3Client.builder()
             .region(Region.of(awsProperties.region))
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
-            .endpointOverride(URI.create("http://10.0.2.2:9009"))
+            //.endpointOverride(URI.create("http://10.0.2.2:9009"))
             .serviceConfiguration(
                 S3Configuration.builder()
                     .pathStyleAccessEnabled(true)
@@ -75,7 +75,7 @@ class S3bucketConfig(
         return S3Presigner.builder()
             .region(Region.of(awsProperties.region))
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
-            .endpointOverride(URI.create("http://10.0.2.2:9009"))
+           // .endpointOverride(URI.create("http://10.0.2.2:9009"))
             .serviceConfiguration(
                 S3Configuration.builder()
                     .pathStyleAccessEnabled(true)

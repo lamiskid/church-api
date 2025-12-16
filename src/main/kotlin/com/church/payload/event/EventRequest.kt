@@ -7,9 +7,8 @@ import java.util.UUID
 data class EventRequest(
     val title: String,
     val description: String,
-    val eventDate: LocalDate,
-    val startTime: LocalTime,
-    val endTime: LocalTime,
+    val eventDate: LocalDate = LocalDate.now(),
+    val startTime: LocalTime = LocalTime.now(),
+    val endTime: LocalTime = LocalTime.now(),
     val location: String,
-    val createdById: UUID
 )

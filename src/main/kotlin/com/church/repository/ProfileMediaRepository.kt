@@ -7,5 +7,5 @@ import java.util.UUID
 
 @Repository
 interface ProfileMediaRepository : JpaRepository<ProfileMedia, Long> {
-    fun findAllByAccountId(accountId: UUID): List<ProfileMedia>
+    fun findAllByProfileId(profileId: UUID):  List<ProfileMedia>
 }

@@ -12,13 +12,13 @@ fun Event.toResponse(): EventResponse =
         startTime = startTime,
         endTime = endTime,
         location = location,
-        createdByName = createdBy.username
+        createdByName = createdBy.email
     )
 
 fun EventAttendance.toResponse(): EventAttendanceResponse =
     EventAttendanceResponse(
         attendanceId = id,
         eventId = event.id,
-        userName = user.username,
+        userName = user.email,
         status = status.name
     )

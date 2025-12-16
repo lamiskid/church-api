@@ -28,18 +28,66 @@ class SermonService(
     private val s3ServiceUtil: S3ServiceUtil
 ) {
 
+
+    fun generateUploadUrl(authUserId: UUID): PresignedUploadResponse {
+        val fileName = "sermon-${UUID.randomUUID()}.mp3"
+        return s3ServiceUtil.generatePresignedUploadUrl(
+            userId = UUID.randomUUID(),
+            folder = "sermons",
+            fileName = fileName,
+            contentType = "audio/mpeg"
+        )
+    }
+
     @Transactional
+    fun createSermon(request: SermonRequest, user:User): SermonResponse {
+
+        val sermon = Sermon(
+            title = request.title,
+            content = request.content,
+            preacher = request.preacher,
+            createdBy = user.getId()
+        )
+        sermonRepository.save(sermon)
+
+        val media = SermonMedia(
+            sermon = sermon,
+            account = user.toAccount(),
+            type = request.mediaType,
+            mediaUrl = request.fileUrl,
+            signedUploadUrl = ""
+
+        )
+        sermonMediaRepository.save(media)
+
+        sermon.media = media
+        sermonRepository.save(sermon)
+
+        return sermon.toResponseDto()
+    }
+
+    fun getAllSermons(page: Int, size: Int): PageResponse<SermonResponse> {
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
+        val pageData = sermonRepository.findAll(pageable)
+        return PaginationMapper.toPageResponse(pageData) { it.toResponseDto() }
+    }
+
+   /* @Transactional
     fun createSermon(sermonRequest: SermonRequest, authUserId: UUID): PresignedUploadResponse {
+      val sermonMedia=  SermonMedia(
+
+        )
+
         val sermon = Sermon(
             title = sermonRequest.title,
             content = sermonRequest.content,
             preacher = sermonRequest.preacher,
-            createdBy = authUserId
+            createdBy = authUserId,
+            sermonMedia =
         )
         sermonRepository.save(sermon)
-       return s3ServiceUtil.generatePresignedUploadUrl("",authUserId,"","mp3")
-       // return sermonRepository.save(sermon).toResponseDto()
-    }
+       return s3ServiceUtil.generatePresignedUploadUrl("sermon",authUserId,"sermon.mp3","audio/mpeg")
+    }*/
 
     fun confirmSermonUpload(user: User, sermonId: UUID, confirmUploadRequest: ConfirmUploadRequest):SermonResponse{
         val sermonOptional = sermonRepository.findById(sermonId)
@@ -75,11 +123,12 @@ class SermonService(
     }
 
 
-    fun getAllSermons(page: Int, size: Int): PageResponse<SermonResponse> {
+  /*  fun getAllSermons(page: Int, size: Int): PageResponse<SermonResponse> {
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
         val sermons = sermonRepository.findAll(pageable)
+
         return PaginationMapper.toPageResponse(sermons) { it.toResponseDto() }
-    }
+    }*/
 
 
     fun getSermonById(id: UUID): SermonResponse {

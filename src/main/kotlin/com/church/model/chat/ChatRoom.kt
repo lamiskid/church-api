@@ -17,6 +17,8 @@ data class ChatRoom(
     @Column(nullable = false)
     val type: ChatRoomType = ChatRoomType.GROUP,
 
+    val description: String?,
+
     @Column(name = "channel_id", nullable = false, unique = true)
     val channelId: String,
 

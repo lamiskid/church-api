@@ -1,7 +1,7 @@
 package com.church.payload.centrifugo
 
 import com.church.model.chat.ChatRoomType
-import com.church.payload.chat.UserSummary
+import com.church.payload.chat.ChatMembersDetails
 
 
 data class ChatRoomPayload(
@@ -9,5 +9,5 @@ data class ChatRoomPayload(
     val name: String,
     val channelId: String,
     val type: ChatRoomType,
-    val participants: List<UserSummary>
+    val participants: List<ChatMembersDetails>
 )

@@ -27,7 +27,7 @@ class ProfileMediaService(
             approved = true
         )*/
         val profileMedia1 = ProfileMedia(
-            account = account,
+            profile = account.profile!!,
             signedUploadUrl = request.signedUploadUrl,
             mediaUrl = request.mediaUrl
         )
@@ -40,7 +40,7 @@ class ProfileMediaService(
     }
 
     fun getMediaForAccount(account: Account): List<ProfileMediaResponse> =
-        profileMediaRepository.findAllByAccountId(account.id!!)
+        profileMediaRepository.findAllByProfileId(account.profile?.id!!)
             .map {
                 ProfileMediaResponse(
                     type = it.type,

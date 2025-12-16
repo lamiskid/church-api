@@ -1,6 +1,6 @@
 package com.church.service
 
-import com.church.model.prayerrequest.PrayerRequest
+import com.church.model.prayer.PrayerRequest
 import com.church.payload.pagination.PageResponse
 import com.church.payload.pagination.PaginationMapper.toPageResponse
 import com.church.payload.prayerrequest.CreatePrayerRequest
@@ -27,7 +27,10 @@ import java.util.UUID
             approved = true,
             isAnonymous = createPrayerRequest.isAnonymous
         )
-        val saved = prayerRequestRepository.save(prayer)
+       val saved = prayerRequestRepository.save(prayer)
+
+        // Push real-time update to Centrifugo “prayers” channel
+        // centrifugoService.publishPrayerCreated(newRequest)
         return saved.toDto()
     }
 
@@ -44,7 +47,7 @@ import java.util.UUID
     }
 
     @Transactional
-    open fun approvePrayerRequest(id: UUID): PrayerRequestResponse? {
+    open fun approvePrayerRequest(id: Long): PrayerRequestResponse? {
         val prayer = prayerRequestRepository.findById(id).get()
         val updated = prayer.copy(approved = true)
         val saved = prayerRequestRepository.save(updated)
@@ -55,7 +58,7 @@ import java.util.UUID
         id = id,
         title = title,
         message = message,
-        submittedBy = "",
+        submittedBy = account.profile?.firstName +" "+ account.profile?.lastName?.substring(0,1) +".",
         isAnonymous = isAnonymous,
         createdAt = createdAt
     )

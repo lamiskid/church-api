@@ -8,7 +8,7 @@ fun Message.toResponse(): MessageResponse =
         id = id,
         chatRoomId = chatRoom.id,
         senderId = sender.id!!,
-        senderName = sender.username,
+        senderName = sender.email,
         content = content,
         createdAt = createdAt
     )
@@ -20,7 +20,8 @@ fun ChatRoom.toResponse(): ChatRoomResponse =
         name = name,
         type = type,
         channelId = channelId,
-        participants = participants.map { UserSummary(requireNotNull( it.id), it.username) },
+        participants = participants.map { ChatMembersDetails(requireNotNull( it.id), it.email) },
+        description = description?:"",
         lastMessage = null
     )
 
@@ -29,8 +30,9 @@ fun ChatRoom.toResponse(lastMessage: Message?): ChatRoomResponse {
         id = id,
         name = name,
         type = type,
+        description = description?:"",
         channelId = channelId,
-        participants = participants.map { UserSummary(it.id, it.username) },
+        participants = participants.map { ChatMembersDetails(it.id, it.email) },
         lastMessage = lastMessage?.let {
             MessageResponse(
                 id = it.id,
@@ -38,7 +40,7 @@ fun ChatRoom.toResponse(lastMessage: Message?): ChatRoomResponse {
                 content = it.content,
                 createdAt = it.createdAt,
                 chatRoomId = id,
-                senderName = it.sender.firstName
+                senderName = it.sender.email
             )
         }
     )

@@ -7,6 +7,7 @@ data class ChatRoomResponse(
     val name: String,
     val type: ChatRoomType,
     val channelId: String,
+    val description:String,
     val lastMessage: MessageResponse?,
-    val participants: List<UserSummary>
+    val participants: List<ChatMembersDetails>
 )
