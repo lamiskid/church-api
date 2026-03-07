@@ -7,6 +7,7 @@ import com.church.payload.profile.ProfileResponse
 import com.church.payload.profile.toDto
 import com.church.repository.AccountRepository
 import com.church.repository.ProfileRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -18,7 +19,7 @@ class ProfileService(
 
     fun getProfile(accountId: UUID): ProfileResponse {
         val profile = profileRepository.findByAccountId(accountId)
-            ?: throw ApiException("Profile not found for account $accountId")
+            ?: throw ApiException("Profile not found",HttpStatus.UNAUTHORIZED,HttpStatus.UNAUTHORIZED.name)
 
         return profile.toDto()
     }
@@ -81,7 +82,7 @@ class ProfileService(
         val existing = profileRepository.findByAccountId(accountId)
 
         val account = existing?.account ?: accountRepository.findById(accountId)
-            .orElseThrow { ApiException("Account not found: $accountId") }
+            .orElseThrow { ApiException("Account not found: $accountId",) }
 
         val profile = Profile(
             id = existing?.id,

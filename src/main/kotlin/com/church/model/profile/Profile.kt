@@ -18,6 +18,7 @@ data class Profile(
     val lastName: String,
     val phone: String? = null,
     val address: String? = null,
+    val phoneNumber:String?=null,
     val profilePictureUrl: String? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
