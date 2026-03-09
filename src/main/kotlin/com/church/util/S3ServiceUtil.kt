@@ -104,4 +104,28 @@ class S3ServiceUtil(
             objectKey = objectKey
         )
     }
+
+
+    fun generatePresignedUploadUrlV2(
+        objectKey:String,
+        contentType: String
+    ): PresignedUploadResponse {
+        val putObjectRequest = PutObjectRequest.builder()
+            .bucket(awsProperties.bucketName)
+            .key(objectKey)
+            .contentType(contentType)
+            .build()
+
+        val presignRequest = PutObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofMinutes(10))
+            .putObjectRequest(putObjectRequest)
+            .build()
+
+        val presignedRequest = s3Presigner.presignPutObject(presignRequest)
+
+        return PresignedUploadResponse(
+            uploadUrl = presignedRequest.url(),
+            objectKey = objectKey
+        )
+    }
 }

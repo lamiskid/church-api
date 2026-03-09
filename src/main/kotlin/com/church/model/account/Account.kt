@@ -18,6 +18,9 @@ class Account(
     @Column(nullable = false)
     val password:String,
 
+    @Enumerated(EnumType.STRING)
+    val accountStatus: AccountStatus = AccountStatus.ACTIVE,
+
     @Column(name = "created_at", nullable = false)
     val createdAt: Long = System.currentTimeMillis(),
 

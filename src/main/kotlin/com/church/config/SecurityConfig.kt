@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -46,7 +47,7 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
-            .cors { it.disable() }
+            .cors (Customizer.withDefaults())
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
@@ -87,7 +88,7 @@ class SecurityConfig(
     fun corsFilter(): CorsFilter {
         val corsConfig = CorsConfiguration()
         corsConfig.addAllowedOrigin("*")
-        corsConfig.addAllowedHeader("*")
+        //corsConfig.addAllowedHeader("*")
         corsConfig.allowCredentials = false
         corsConfig.allowedHeaders = listOf(
             "Origin", "Access-control-allow-Origin", "Content-type",

@@ -8,5 +8,6 @@ data class SermonRequest(
     val content: String,
     val preacher: String,
     val fileUrl: String,
+    val signedUploadUrl:String?,
     val mediaType: MediaType = MediaType.AUDIO
 )

@@ -12,10 +12,7 @@ import com.church.payload.LoginResponse
 import com.church.payload.RegisterRequest
 import com.church.payload.refreshtoken.RefreshTokenRequest
 import com.church.payload.refreshtoken.RefreshTokenResponse
-import com.church.repository.AccountRepository
-import com.church.repository.RefreshTokenRepository
-import com.church.repository.UserRoleRepository
-import com.church.repository.VerificationTokenRepository
+import com.church.repository.*
 import com.church.security.JwtUtil
 import com.church.security.User
 import com.church.util.EmailUtil
@@ -39,7 +36,8 @@ class AuthenticationService(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtUtils: JwtUtil,
     private val emailUtil: EmailUtil,
-    private val verificationTokenRepository: VerificationTokenRepository
+    private val verificationTokenRepository: VerificationTokenRepository,
+    private val profileRepository: ProfileRepository,
 )
 {
 
@@ -86,11 +84,14 @@ class AuthenticationService(
 
            val refreshToken = createRefreshToken(authRequest.email)
 
+            val hasProfile =  profileRepository.existsByAccountId(userAccountDetails.getId())
+
             return LoginResponse(
                 username = userAccountDetails.username,
                 accessToken = jwtUtils.generateToken(userAccountDetails),
                 refreshToken =refreshToken.token,
-                roles= roles
+                roles= roles,
+                hasProfile= hasProfile
             )
         } else {
             throw UsernameNotFoundException("Invalid user request!")

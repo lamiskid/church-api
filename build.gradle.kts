@@ -34,6 +34,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-mail")
 	//s3 bucket
 	implementation("software.amazon.awssdk:s3:2.36.0")
+	// stripe  payment
+	implementation("com.stripe:stripe-java:31.4.0")
 
 	implementation("org.springframework.retry:spring-retry")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")

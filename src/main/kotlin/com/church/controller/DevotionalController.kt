@@ -1,9 +1,9 @@
 package com.church.controller
 
 
-import com.church.payload.devotiona.DevotionalResponse
 import com.church.payload.devotional.DevotionalBookmarkResponse
 import com.church.payload.devotional.DevotionalRequest
+import com.church.payload.devotional.DevotionalResponse
 import com.church.payload.pagination.PageResponse
 import com.church.security.User
 import com.church.service.DevotionalService

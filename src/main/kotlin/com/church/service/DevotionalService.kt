@@ -4,8 +4,9 @@ package com.church.service
 import com.church.exception.ApiException
 import com.church.model.devotional.Devotional
 import com.church.model.devotional.DevotionalBookmark
-import com.church.payload.devotiona.DevotionalResponse
+
 import com.church.payload.devotional.DevotionalRequest
+import com.church.payload.devotional.DevotionalResponse
 import com.church.payload.pagination.PageResponse
 import com.church.payload.pagination.PaginationMapper.toPageResponse
 import com.church.repository.DevotionalBookmarkRepository

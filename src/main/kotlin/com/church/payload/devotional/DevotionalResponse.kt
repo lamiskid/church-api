@@ -1,4 +1,4 @@
-package com.church.payload.devotiona
+package com.church.payload.devotional;
 
 import java.time.Instant
 

@@ -30,11 +30,17 @@ class SermonController(
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
-
-    @PostMapping("/media/upload-url")
-    fun getUploadUrl(@AuthenticationPrincipal user: User): PresignedUploadResponse {
-        return sermonService.generateUploadUrl(user.getId())
+    @GetMapping("/media/signed-url")
+    fun getSignedUploadUrl(): PresignedUploadResponse {
+        return sermonService.generateUploadUrl(UUID.randomUUID())
     }
+
+    @PreAuthorize("hasAnyRole('PASTOR','ADMIN')")
+    @GetMapping("/v2/media/signed-url")
+    fun getSignedUploadUrlV2(@RequestParam("fileName") fileName:String): PresignedUploadResponse {
+        return sermonService.generateUploadUrlV2(fileName)
+    }
+
 
     @PostMapping("/confirm-upload/{sermonId}")
     fun confirmSermonUpload(@AuthenticationPrincipal user: User,@PathVariable sermonId: UUID, @RequestBody confirmUploadRequest: ConfirmUploadRequest): ResponseEntity<SermonResponse> {

@@ -32,9 +32,18 @@ class SermonService(
     fun generateUploadUrl(authUserId: UUID): PresignedUploadResponse {
         val fileName = "sermon-${UUID.randomUUID()}.mp3"
         return s3ServiceUtil.generatePresignedUploadUrl(
-            userId = UUID.randomUUID(),
-            folder = "sermons",
-            fileName = fileName,
+            folder = "",
+            userId = authUserId,
+            fileName= fileName,
+            contentType = "audio/mpeg"
+        )
+    }
+
+    fun generateUploadUrlV2(fileName:String): PresignedUploadResponse {
+        val sanitizedFileName = fileName.replace(Regex("[^A-Za-z0-9._-]"), "_")
+        val objectKey = "sermon/${UUID.randomUUID()}_$sanitizedFileName"
+        return s3ServiceUtil.generatePresignedUploadUrlV2(
+            objectKey,
             contentType = "audio/mpeg"
         )
     }

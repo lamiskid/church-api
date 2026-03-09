@@ -27,7 +27,7 @@ class GlobalExceptionHandler {
             httpStatus = ex.status,
             message = ex.message,
             path = request.requestURI,
-            // errorCode = ex.errorCode
+            //errorCode = ex.errorCode
         )
         return ResponseEntity.status(ex.status).body(response)
     }
@@ -85,7 +85,7 @@ class GlobalExceptionHandler {
     ): ErrorResponse {
         return ErrorResponse(
             message = exception.message,
-            httpStatus = HttpStatus.NOT_FOUND,
+            httpStatus = HttpStatus.BAD_REQUEST,
             path = request.requestURI,
         )
     }
