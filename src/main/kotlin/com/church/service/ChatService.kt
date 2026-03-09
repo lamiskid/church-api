@@ -144,6 +144,7 @@ class ChatService(
                 firstName = account.profile?.firstName ?: "",
                 lastName = account.profile?.lastName ?: "",
                 profilePictureUrl = account.profile?.profilePictureUrl,
+                address = account.profile?.address ?: "",
                 role = account.userRoles.map { userRole -> userRole.roleType },
             )
         }
