@@ -2,18 +2,36 @@ spring:
   application:
     name: church-application
 
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+#  datasource:
+#    url: ${DB_URL}
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+#    driver-class-name: org.postgresql.Driver
+#
+#
+#  jpa:
+#    database: POSTGRESQL
+#    show-sql: true
+#    hibernate:
+#      ddl-auto: update
 
+
+  datasource:
+    url: jdbc:h2:mem:churchdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
   jpa:
-    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 
   liquibase:

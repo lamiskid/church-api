@@ -36,6 +36,7 @@ dependencies {
 	implementation("software.amazon.awssdk:s3:2.36.0")
 	// stripe  payment
 	implementation("com.stripe:stripe-java:31.4.0")
+	implementation("com.h2database:h2")
 
 	implementation("org.springframework.retry:spring-retry")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
